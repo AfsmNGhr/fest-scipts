@@ -2,9 +2,16 @@
 require 'fest'
 
 if `xbacklight`.to_i == 0
-  system("systemctl poweroff")
+  @list = `transmission-remote -l | awk '{ print $5 }'`.split("\n")
+  @statuses = @list - [@list[0], @list[-1]]
+  counts = 0
+
+  @statuses.each do |status|
+    counts += 1 if status == "Done"
+  end
+
+  system("systemctl poweroff") if counts == @statuses.size
 else
-  text = "Загр+узка завершена"
   @fest = Fest.new
-  @fest.say(text)
+  @fest.say("Загр+узка завершена")
 end
