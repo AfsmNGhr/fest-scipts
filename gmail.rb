@@ -6,30 +6,29 @@ require 'yaml'
 
 if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
 
-  Gmail.new("login", "password") do |gmail|
-
+  Gmail.new('login', 'password') do |gmail|
     @fest = Fest.new
-    @labels = {"INBOX" => "Входящие", "Search job" => "Поиск работы",
-               "Music" => "Музыка", "Advertising" => "Реклама",
-               "Education" => "Обучение", "Interesting" => "Интер+есное",
-               "IT" => "Ай ти"}
+    @labels = { 'INBOX' => 'Входящие', 'Search job' => 'Поиск работы',
+                'Music' => 'Музыка', 'Advertising' => 'Реклама',
+                'Education' => 'Обучение', 'Interesting' => 'Интер+есное',
+                'IT' => 'Ай ти' }
 
     def check_counts_letters(gmail)
       counts = {}
-      @labels.each do |k,v|
-        h = {k => gmail.mailbox(k).count(:unread)}
+      @labels.each do |k, _v|
+        h = { k => gmail.mailbox(k).count(:unread) }
         counts.merge!(h)
       end
-      return counts
+      counts
     end
 
     def read_old_counts_letters
-      File.exist?(".gmail.yml") ? YAML::load(File.open(".gmail.yml")) : {}
+      File.exist?('.gmail.yml') ? YAML.load(File.open('.gmail.yml')) : {}
     end
 
     def save_counts_letters(counts)
-      system("touch .gmail.yml") if File.exist?(".gmail.yml")
-      File.open(".gmail.yml", "w") do |f|
+      system('touch .gmail.yml') if File.exist?('.gmail.yml')
+      File.open('.gmail.yml', 'w') do |f|
         f.write counts.to_yaml
       end
     end
@@ -48,20 +47,13 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
     end
 
     def say_new_counts(k, count)
-      unless count == 0
-        text = @fest.pluralform(count, ['сообщение',
-                                        'сообщения',
-                                        'сообщений'])
-        count = "Одн+о" if count == 1
-
-        @fest.say(
-          if k == "INBOX"
-            "У вас #{count} #{text}"
-          else
-            "#{count} #{text} в разделе #{@labels[k]}"
-          end
-        )
-      end
+      text = @fest.pluralform(count, %w(сообщение сообщения сообщений))
+      count = 'Одн+о' if count == 1
+      all = "У вас #{count} #{text}"
+      part = "#{count} #{text} в разделе #{@labels[k]}"
+      @fest.say(
+        k == 'INBOX' ? all : part
+      ) unless count == 0
     end
 
     counts = check_counts_letters(gmail)
@@ -69,7 +61,6 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
     check_new_counts_letters(counts, old_counts)
     save_counts_letters(counts)
     gmail.logout
-
   end
 
 end

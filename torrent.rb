@@ -7,11 +7,11 @@ if `xbacklight`.to_i == 0
   counts = 0
 
   @statuses.each do |status|
-    counts += 1 if status == "Done"
+    counts += 1 if status == 'Done'
   end
 
-  system("systemctl poweroff") if counts == @statuses.size
+  system('systemctl poweroff') if counts == @statuses.size
 else
   @fest = Fest.new
-  @fest.say("Загр+узка завершена")
+  @fest.say('Загр+узка завершена')
 end

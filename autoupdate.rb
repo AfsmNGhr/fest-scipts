@@ -1,14 +1,10 @@
 # coding: utf-8
 require 'net/ping'
+require 'fest'
 
 if Net::Ping::TCP.new('www.google.com', 'http').ping?
-
-  festival = "$HOME/.bin/festival/"
-  begin_update = "Внимание, запускаю обновление системы"
-  clear = "Очистка системы"
-
-  system("#{festival}say.sh '#{begin_update}'")
-  system("#{festival}say.sh '#{clear}'")
-  `pacman -Su`
-
+  @fest = Fest.new
+  @fest.say('Внимание, запускаю обновление системы')
+  @fest.say('Очистка системы')
+  system('pacman -Rns $(pacman -Qtdq)')
 end
