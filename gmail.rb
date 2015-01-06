@@ -53,11 +53,12 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
                                         'сообщений'])
         count = "Одн+о" if count == 1
 
-        if k == "INBOX"
-          @fest.say("У вас #{count} #{text}")
-        else
-          @fest.say("#{count} #{text} в разделе #{@labels[k]}")
-        end
+        @fest.say(if k == "INBOX"
+                   "У вас #{count} #{text}"
+                  else
+                   "#{count} #{text} в разделе #{@labels[k]}"
+                  end
+                 )
       end
     end
 

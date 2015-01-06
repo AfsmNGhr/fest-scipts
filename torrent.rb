@@ -2,8 +2,8 @@
 require 'fest'
 
 if `xbacklight`.to_i == 0
-  @list = `transmission-remote -l | awk '{ print $5 }'`.split("\n")
-  @statuses = @list - [@list[0], @list[-1]]
+  @statuses = `transmission-remote -l | awk '{ print $5 }'`.split("\n")
+  @statuses -= [@statuses[0], @statuses[-1]]
   counts = 0
 
   @statuses.each do |status|
