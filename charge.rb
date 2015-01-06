@@ -15,5 +15,3 @@ procent = @fest.pluralform(charge, ["процент",
     "Критический заряд батареи."
   end
 )
-
-exit

@@ -24,8 +24,7 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
     end
 
     def read_old_counts_letters
-      return {} unless File.exist?(".gmail.yml")
-      old_counts = YAML::load(File.open(".gmail.yml"))
+      File.exist?(".gmail.yml") ? YAML::load(File.open(".gmail.yml")) : {}
     end
 
     def save_counts_letters(counts)
@@ -37,11 +36,13 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
 
     def check_new_counts_letters(counts, old_counts)
       counts.each do |k, v|
-        if old_counts.empty? || v < old_counts[k]
-          count = v
-        else
-          count = v - old_counts[k]
-        end
+        count = (
+          if old_counts.empty? || v < old_counts[k]
+            v
+          else
+            v - old_counts[k]
+          end
+        )
         say_new_counts(k, count)
       end
     end
