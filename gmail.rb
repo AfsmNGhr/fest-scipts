@@ -14,12 +14,12 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
                 'IT' => 'Ай ти' }
 
     def check_counts_letters(gmail)
-      counts = {}
+      @counts = {}
       @labels.each do |k, _v|
         h = { k => gmail.mailbox(k).count(:unread) }
-        counts.merge!(h)
+        @counts.merge!(h)
       end
-      counts
+      @counts
     end
 
     def read_old_counts_letters
@@ -29,17 +29,17 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
     def save_counts_letters(counts)
       system('touch .gmail.yml') if File.exist?('.gmail.yml')
       File.open('.gmail.yml', 'w') do |f|
-        f.write counts.to_yaml
+        f.write @counts.to_yaml
       end
     end
 
-    def check_new_counts_letters(counts, old_counts)
-      counts.each do |k, v|
+    def check_new_counts_letters
+      @counts.each do |k, v|
         count = (
-          if old_counts.empty? || v < old_counts[k]
+          if @old_counts.empty? || v < @old_counts[k]
             v
           else
-            v - old_counts[k]
+            v - @old_counts[k]
           end
         )
         say_new_counts(k, count)
@@ -51,15 +51,13 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
       count = 'Одн+о' if count == 1
       all = "У вас #{count} #{text}"
       part = "#{count} #{text} в разделе #{@labels[k]}"
-      @fest.say(
-        k == 'INBOX' ? all : part
-      ) unless count == 0
+      @fest.say(k == 'INBOX' ? all : part) unless count == 0
     end
 
-    counts = check_counts_letters(gmail)
-    old_counts = read_old_counts_letters
-    check_new_counts_letters(counts, old_counts)
-    save_counts_letters(counts)
+    check_counts_letters(gmail)
+    @old_counts = read_old_counts_letters
+    check_new_counts_letters
+    save_counts_letters
     gmail.logout
   end
 
