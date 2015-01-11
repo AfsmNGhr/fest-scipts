@@ -14,7 +14,7 @@ GEM_HOME=$(gem environment gemdir)
 GEM_PATH=$(gem environment gemdir)
 DISPLAY=:0
 */10 * * * * /usr/bin/env ruby ~/.bin/festival/charge.rb
-*/20 * * * * /usr/bin/env ruby ~/.bin/festival/data/gmail.rb
+*/20 * * * * /usr/bin/env ruby ~/.bin/festival/gmail.rb
 */30 * * * * /usr/bin/env ruby ~/.bin/festival/quotes.rb
 
 #+end_src
