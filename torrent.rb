@@ -10,6 +10,7 @@ if `xbacklight`.to_i == 0
     counts += 1 if status == 'Done'
   end
 
+  sleep 600
   system('systemctl poweroff') if counts == @statuses.size
 else
   @fest = Fest.new
