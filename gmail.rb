@@ -26,7 +26,7 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
       File.exist?('.gmail.yml') ? YAML.load(File.open('.gmail.yml')) : {}
     end
 
-    def save_counts_letters(counts)
+    def save_counts_letters
       system('touch .gmail.yml') if File.exist?('.gmail.yml')
       File.open('.gmail.yml', 'w') do |f|
         f.write @counts.to_yaml
