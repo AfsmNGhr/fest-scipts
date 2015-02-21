@@ -1,6 +1,6 @@
 ** Fest scripts
-Скрипты, использующие [[https://github.com/AfsmNGhr/fest][fest]] ...
-** Требования
+The scripts using [[https://github.com/AfsmNGhr/fest][fest]] ...
+** Requirements
 - *nix* or OS X ...
 - ruby
 - [[https://wiki.archlinux.org/index.php/Festival_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29][Festival]] и нужные языки...
@@ -13,8 +13,7 @@ SHELL=/bin/bash
 GEM_HOME=$(gem environment gemdir)
 GEM_PATH=$(gem environment gemdir)
 DISPLAY=:0
-*/10 * * * * /usr/bin/env ruby ~/.bin/festival/charge.rb
-*/20 * * * * /usr/bin/env ruby ~/.bin/festival/gmail.rb
-*/30 * * * * /usr/bin/env ruby ~/.bin/festival/quotes.rb
-
+*/10 * * * * ~/.bin/festival/charge
+*/20 * * * * ~/.bin/festival/gmail
+*/30 * * * * ~/.bin/festival/quotes
 #+end_src
