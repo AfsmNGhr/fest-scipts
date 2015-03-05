@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+require 'net/ping'
+require 'open-uri'
+require 'nokogiri'
+require 'fest'
+
+def init
+  @fest = Fest.new
+  @doc = Nokogiri::HTML(open('https://m.pogoda.yandex.ru/'))
+  @t_now = @doc.css('.info strong').text
+  @cond_now = @doc.css('.b-now p:first').text
+  @params_now = @doc.css('.b-now p')
+end
+
+def conditions(conditions)
+  new = []
+  conditions.each do |cond|
+    new << case cond
+           when /Облачно/i then '+Облачно'
+           when /Дождь/i then cond.gsub(/Дождь/i, 'Д+ождь')
+           when /Облачно с прояснениями/i then '+Облачно с происн+ениями'
+           else cond
+           end
+  end
+  new
+end
+
+def weather_for_now
+  @fest.say(
+    ['Сейч+ас на +улице',
+     temperature(@t_now),
+     conditions(@cond_now.split(', ')),
+     weather_params_now(@params_now)].join(' ')
+  )
+end
+
+def weather_params_now(params)
+  new = []
+  params.each do |p|
+    new << p.text.split(', ') unless p.text.eql?(@cond_now)
+  end
+  [wind(new[0]),
+   humidity(new[0]),
+   pressure(new[1])]
+end
+
+def pressure(params)
+  /(\d+)/.match(params[0])
+  ['-- Давл+ение',
+   Regexp.last_match[1].to_i,
+   @fest.pluralform(
+     Regexp.last_match[1].to_i,
+     %w(меллим+етр меллим+етра миллим+етров)),
+   'ртутного столба']
+end
+
+def humidity(params)
+  /(\d+)/.match(params[2])
+  ['-- Влажность',
+   Regexp.last_match[1].to_i,
+   @fest.pluralform(
+     Regexp.last_match[1].to_i,
+     %w(проц+ент проц+ента проц+ентов))]
+end
+
+def wind(params)
+  /\s(\W+)/.match(params[0])
+  ['-- Ветер',
+   wind_direct(Regexp.last_match[1]),
+   wind_force(params[1])]
+end
+
+def wind_direct(direct)
+  case direct
+  when 'С' then 'Северный'
+  when 'СЗ' then 'Северо-з+апад ный'
+  when 'СВ' then 'Северо-вост+оч ный'
+  when 'З' then 'Западный'
+  when 'В' then 'Восточный'
+  when 'Ю' then 'Южный'
+  when 'ЮЗ' then 'Юго-з+апад ный'
+  when 'ЮВ' then 'Юго-вост+оч ный'
+  end
+end
+
+def wind_force(force)
+  [force.to_i,
+   @fest.pluralform(
+     force.to_i, %w(м+етр м+етра м+етров)),
+   'в сек+унду']
+end
+
+def temperature(t)
+  /-/.match(t) ? new = ['минус'] : new = []
+  new << [t.to_i,
+          @fest.pluralform(
+            t.to_i, %w(гр+адус гр+адуса гр+адусов))]
+end
+
+if Net::Ping::TCP.new('www.m.pogoda.yandex.ru', 'http').ping?
+  init
+  weather_for_now
+end
