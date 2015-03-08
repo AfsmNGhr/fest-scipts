@@ -93,7 +93,7 @@ end
 
 def temperature(t)
   /-/.match(t) ? new = ['минус'] : new = []
-  new << [t.to_i,
+  new << [t.to_i == 0 ? 'н+ооль' : t.to_i,
           @fest.pluralform(
             t.to_i, %w(гр+адус гр+адуса гр+адусов))]
 end
@@ -102,3 +102,11 @@ if Net::Ping::TCP.new('www.m.pogoda.yandex.ru', 'http').ping?
   init
   weather_for_now
 end
+
+# @doc = Nokogiri::HTML(open('https://m.pogoda.yandex.ru/'))
+# new = []
+# @doc.css('table:first th').each do |th|
+#   p th.text
+#   p th.css('.b-t_0').text
+# end
+# p new
