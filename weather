@@ -29,7 +29,7 @@ end
 def weather_for_now
   @fest.say(
     ['Сейч+ас на +улице',
-     temperature(@t_now),
+     temperature(@t_now), '-',
      conditions(@cond_now.split(', ')),
      weather_params_now(@params_now)].join(' ')
   )
@@ -61,13 +61,13 @@ def humidity(params)
    Regexp.last_match[1].to_i,
    @fest.pluralform(
      Regexp.last_match[1].to_i,
-     %w(проц+ент проц+ента проц+ентов))]
+     ['проце нт', 'проц+ента', 'проц+ентов'])]
 end
 
 def wind(params)
   /\s(\W+)/.match(params[0])
   ['-- Ветер',
-   wind_direct(Regexp.last_match[1]),
+   wind_direct(Regexp.last_match[1]), '-',
    wind_force(params[1])]
 end
 
@@ -85,7 +85,7 @@ def wind_direct(direct)
 end
 
 def wind_force(force)
-  [force.to_i,
+  [force.to_i, '-',
    @fest.pluralform(
      force.to_i, %w(м+етр м+етра м+етров)),
    'в сек+унду']

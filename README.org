@@ -16,5 +16,5 @@ DISPLAY=:0
 */10 * * * * ~/.bin/festival/charge
 */20 * * * * ~/.bin/festival/gmail
 */30 * * * * ~/.bin/festival/quotes
-* */4 * * * ~/.bin/festival/weather
+0 */4 * * * ~/.bin/festival/weather
 #+end_src
