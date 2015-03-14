@@ -12,7 +12,8 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
     @labels = { 'INBOX' => 'Входящие', 'Search job' => 'Поиск работы',
                 'Music' => 'Музыка', 'Advertising' => 'Реклама',
                 'Education' => 'Обучение', 'Interesting' => 'Интер+есное',
-                'IT' => 'Ай ти' }
+                'IT' => 'Ай ти', 'Freelance' => 'Фрии+ла+йнс',
+                'Development' => 'Разработ ка' }
 
     def check_counts_letters(gmail)
       @counts = {}
