@@ -98,15 +98,43 @@ def temperature(t)
             t.to_i, %w(гр+адус гр+адуса гр+адусов))]
 end
 
+def weather_today
+  today = []
+  table_hash(@doc.css('table:first th')).each do |k, v|
+    today << part_day(k)
+  end
+  p today
+  # @fest.say(today.join(' '))
+end
+
+def table_hash(table)
+  new = {}
+  table.each do |th|
+    h = { th.text => th.parent.next_element.text }
+    new.merge!(h)
+  end
+  new
+end
+
+def part_day(part)
+  case part
+  when /утро/i then 'утром'
+  when /день/i then 'днём'
+  when /вечер/i then 'вечером'
+  when /ночь/i then 'ночью'
+  end
+end
+
+
 if Net::Ping::TCP.new('www.m.pogoda.yandex.ru', 'http').ping?
   init
   weather_for_now
 end
 
-# @doc = Nokogiri::HTML(open('https://m.pogoda.yandex.ru/'))
-# new = []
-# @doc.css('table:first th').each do |th|
-#   p th.text
-#   p th.css('.b-t_0').text
-# end
-# p new
+# weather_today
+# # @fest.say(@doc.css('#tomorrow').text.split(',').join(' '))
+# today = []
+# table_hash(@doc.css('table:last th')).each do |k, v|
+#     today << part_day(k)
+#   end
+# p today
