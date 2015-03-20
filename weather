@@ -100,7 +100,7 @@ end
 
 def weather_today
   today = []
-  table_hash(@doc.css('table:first th')).each do |k, v|
+  table_hash(@doc.css('table:first th')).each do |k, _v|
     today << part_day(k)
   end
   p today
@@ -124,7 +124,6 @@ def part_day(part)
   when /ночь/i then 'ночью'
   end
 end
-
 
 if Net::Ping::TCP.new('www.m.pogoda.yandex.ru', 'http').ping?
   init
