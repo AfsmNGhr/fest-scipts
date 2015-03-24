@@ -15,13 +15,13 @@ def check_counts_letters(gmail)
 end
 
 def read_old_counts_letters
-  Dir.chdir("/tmp")
-  File.exist?('gmail.yml') ? YAML.load(File.open('gmail.yml')) : {}
+  Dir.chdir(Dir.home)
+  File.exist?('.gmail.yml') ? YAML.load(File.open('.gmail.yml')) : {}
 end
 
 def save_counts_letters
-  system('touch gmail.yml') if File.exist?('gmail.yml')
-  File.open('gmail.yml', 'w') do |f|
+  system('touch .gmail.yml') if File.exist?('.gmail.yml')
+  File.open('.gmail.yml', 'w') do |f|
     f.write @counts.to_yaml
   end
 end
@@ -35,16 +35,17 @@ def check_new_counts_letters
         v - @old_counts[k]
       end
     )
-    say_new_counts(k, count)
+    create_text_new_counts(k, count, msg)
   end
+  msg.join(' ')
 end
 
-def say_new_counts(k, count)
+def create_text_new_counts(k, count, msg)
   text = @fest.pluralform(count, %w(сообщение сообщения сообщений))
   count = 'Одн+о' if count == 1
-  all = "У вас #{count} #{text}"
-  part = "#{count} #{text} в разделе #{@labels[k]}"
-  @fest.say(k == 'INBOX' ? all : part) unless count == 0
+  all = "У вас #{count} #{text} --"
+  part = "#{count} #{text} в разделе #{@labels[k]} --"
+  return msg << (k == 'INBOX' ? all : part) unless count == 0
 end
 
 if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
@@ -62,6 +63,6 @@ if Net::Ping::TCP.new('www.gmail.com', 'http').ping?
   end
 
   @old_counts = read_old_counts_letters
-  check_new_counts_letters
+  @fest.say(check_new_counts_letters)
   save_counts_letters
 end

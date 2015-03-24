@@ -3,7 +3,7 @@
 require 'fest'
 
 emacs = `ps -el | grep emacsclient | wc -l`.to_i
-term = `ps -el | grep terminator | wc -l`.to_i
+term = `ps -el | grep xterm | wc -l`.to_i
 
 quotes = ['Я тоже не люблю делать что-то просто, если это можно сделать через заад-ницу.',
           'Жизнь движение', 'Небо над портом было цвета экрана телевизора, настроенного на пустой канал',
