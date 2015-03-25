@@ -27,6 +27,7 @@ def save_counts_letters
 end
 
 def check_new_counts_letters
+  msg = []
   @counts.each do |k, v|
     count = (
       if @old_counts.empty? || v < @old_counts[k]
