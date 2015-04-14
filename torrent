@@ -1,10 +1,26 @@
-#!/usr/bin/env ruby
+#!/home/afsmnghr/.rvm/rubies/ruby-2.1-head/bin/ruby
 # coding: utf-8
-require 'fest'
+gems = '/home/afsmnghr/.rvm/gems/ruby-2.1-head/gems'
+`ls "#{gems}"`.match(/fest-(\d+).(\d+).(\d+)/i)
+fest = "fest-#{Regexp.last_match[1]}.#{Regexp.last_match[2]}.#{Regexp.last_match[3]}"
+require_relative "#{gems}/#{fest}/lib/fest"
 
-if `xbacklight`.to_i == 0
+def delete_torrents_done
+  @ids = `transmission-remote -l | awk '{ print $1 }`.split("\n")
+  @ids -= [@ids[0], @ids[-1]]
+
+  @ids.each do |id|
+    system("transmission-remote -t '#{id}' -r") if @statuses[] == 'Done'
+  end
+end
+
+def check_statuses
   @statuses = `transmission-remote -l | awk '{ print $5 }'`.split("\n")
   @statuses -= [@statuses[0], @statuses[-1]]
+end
+
+if `xbacklight`.to_i == 0
+  check_statuses
   counts = 0
 
   @statuses.each do |status|
