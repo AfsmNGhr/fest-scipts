@@ -3,11 +3,14 @@
 require 'net/ping'
 require 'open-uri'
 require 'nokogiri'
+require 'mechanize'
 require 'fest'
 
 def init
   @fest = Fest.new
-  @doc = Nokogiri::HTML(open('https://m.pogoda.yandex.ru/'))
+  @agent = Mechanize.new { |agent| agent.user_agent_alias = 'iPhone' }
+  html = @agent.get('https://pogoda.yandex.ru/').body
+  @doc = Nokogiri::HTML(html)
   @t_now = @doc.css('.info strong').text
   @cond_now = @doc.css('.b-now p:first').text
   @params_now = @doc.css('.b-now p')
