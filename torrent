@@ -10,7 +10,7 @@ def delete_torrents_done
   @ids -= [@ids[0], @ids[-1]]
 
   @ids.each do |id|
-    system("transmission-remote -t '#{id}' -r") if @statuses[] == 'Done'
+    system("transmission-remote -t '#{id}' -r")
   end
 end
 
@@ -19,7 +19,7 @@ def check_statuses
   @statuses -= [@statuses[0], @statuses[-1]]
 end
 
-if `xbacklight`.to_i == 0
+if `export DISPLAY=:0 && xbacklight`.to_i == 0
   check_statuses
   counts = 0
 
@@ -28,7 +28,10 @@ if `xbacklight`.to_i == 0
   end
 
   sleep 600
-  system('systemctl poweroff') if counts == @statuses.size
+  if counts == @statuses.size
+    delete_torrents_done
+    system('sudo systemctl poweroff')
+  end
 else
   @fest = Fest.new
   @fest.say('Загр+узка завершена')

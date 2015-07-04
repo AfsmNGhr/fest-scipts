@@ -40,9 +40,13 @@ def weather_params_now(params)
   params.each do |p|
     new << p.text.split(', ') unless p.text.eql?(@cond_now)
   end
-  [wind(new[0]),
-   humidity(new[0]),
-   pressure(new[1])]
+  # if  new == nil
+  #   ['Не получены параметры']
+  # else
+    [wind(new[0]),
+     humidity(new[0]),
+     pressure(new[1])]
+  # end
 end
 
 def pressure(params)
