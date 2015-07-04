@@ -27,7 +27,7 @@ if `export DISPLAY=:0 && xbacklight`.to_i == 0
   sleep 600
   if counts == @statuses.size
     delete_torrents_done
-    system('sudo systemctl poweroff')
+    system('systemctl poweroff')
   end
 else
   @fest = Fest.new
