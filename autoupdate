@@ -4,8 +4,10 @@ require 'net/ping'
 require 'fest'
 
 if Net::Ping::TCP.new('www.google.com', 'http').ping?
-  @fest = Fest.new
-  @fest.say('Внимание, запускаю обновление системы')
-  @fest.say('Очистка системы')
-  system('pacman -Rns $(pacman -Qtdq)')
+  unless `pacman -Qu | wc -l`.to_i == 0
+    @fest = Fest.new
+    @fest.say('Внимание, запускаю обновление системы')
+    system('pacman -Rnsc $(pacman -Qtdq) --noconfirm')
+    system('pacman -Su --noconfirm')
+  end
 end
