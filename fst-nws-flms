@@ -16,7 +16,7 @@ end
 
 unless Film.table_exists?
   ActiveRecord::Schema.define do
-    create_table :films do |table|
+    create_table :films do |t|
      t.string :title
      t.string :genre
      t.text :announce
