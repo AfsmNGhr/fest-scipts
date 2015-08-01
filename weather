@@ -11,9 +11,9 @@ def init
   @agent = Mechanize.new { |agent| agent.user_agent_alias = 'iPhone' }
   html = @agent.get('https://pogoda.yandex.ru/').body
   @doc = Nokogiri::HTML(html)
-  @t_now = @doc.css('.info strong').text
-  @cond_now = @doc.css('.b-now p:first').text
-  @params_now = @doc.css('.b-now p')
+  puts @t_now = @doc.css('.info strong').text
+  puts @cond_now = @doc.css('.b-now p:first').text
+  puts @params_now = @doc.css('.b-now p')
 end
 
 def conditions(conditions)
@@ -134,7 +134,7 @@ end
 
 if Net::Ping::TCP.new('www.m.pogoda.yandex.ru', 'http').ping?
   init
-  weather_for_now
+  #weather_for_now
 end
 
 # weather_today

@@ -1,35 +1,15 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 require 'fest'
+require 'active_support'
+require 'transmission-rpc'
 
-def delete_torrents_done
-  @ids = `transmission-remote -l | awk '{ print $1 }`.split("\n")
-  @ids -= [@ids[0], @ids[-1]]
-
-  @ids.each do |id|
-    system("transmission-remote -t '#{id}' -r")
-  end
-end
-
-def check_statuses
-  @statuses = `transmission-remote -l | awk '{ print $5 }'`.split("\n")
-  @statuses -= [@statuses[0], @statuses[-1]]
+Transmission.torrents.each do |t|
+  t.delete! if t.percent_done.to_i == 1
 end
 
 if `cat /sys/class/backlight/intel_backlight/brightness`.to_i == 0
-  check_statuses
-  counts = 0
-
-  @statuses.each do |status|
-    counts += 1 if status == 'Done'
-  end
-
-  sleep 600
-  if counts == @statuses.size
-    delete_torrents_done
-    system('poweroff')
-  end
+  system('sudo poweroff') if Transmission.torrents.empty?
 else
-  @fest = Fest.new
-  @fest.say('Загр+узка завершена')
+  Fest.new.say('Загр+узка завершена')
 end
