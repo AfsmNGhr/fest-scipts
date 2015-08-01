@@ -45,9 +45,9 @@ Mechanize.new do |agent|
           torrent = row.search('.c7 a').attr('href').value
           Dir.chdir("#{Dir.home}/Downloads")
           system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
-          Film.new(title: item.search('h2').text,
-                   genre: item.search('.film-genre').text,
-                   announce: item.search('.film-announce').text).save!
+          Film.new(title: item.search('h2').text.gsub('/n', ' '),
+                   genre: item.search('.film-genre').text.gsub('/n', ' '),
+                   announce: item.search('.film-announce').text.gsub('/n', ' ')).save!
         end
       end
     end
