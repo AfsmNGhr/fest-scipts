@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+require 'open-uri'
+require 'nokogiri'
+require 'mechanize'
+require 'active_record'
+require 'active_support'
+
+ActiveRecord::Base.establish_connection(
+  adapter: 'sqlite3',
+  database: './data/torrents'
+)
+
+class Film < ActiveRecord::Base
+end
+
+unless Film.table_exists?
+  ActiveRecord::Schema.define do
+    create_table :films do |table|
+     t.string :title
+     t.string :genre
+     t.text :announce
+     t.timestamps
+    end
+  end
+end
+
+Mechanize.new do |agent|
+  agent.user_agent_alias = 'Mac FireFox'
+  agent.follow_meta_refresh = true
+  per_page = 1
+
+  6.times do
+    page =
+      if per_page == 1
+        agent.get('http://www.fast-torrent.ru/new-films/')
+      else
+        agent.get("http://www.fast-torrent.ru/new-films/#{per_page}.html")
+      end
+
+    page.search('.film-item').each do |item|
+      download = agent.get(item.search('.film-download').attr('href').value)
+      download.search('.torrent-row').each do |row|
+        if row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?
+          torrent = row.search('.c7 a').attr('href').value
+          Dir.chdir("#{Dir.home}/Downloads")
+          system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
+          Film.new(title: item.search('h2').text,
+                   genre: item.search('.film-genre').text,
+                   announce: item.search('.film-announce').text).save!
+        end
+      end
+    end
+
+    per_page += 1
+  end
+end

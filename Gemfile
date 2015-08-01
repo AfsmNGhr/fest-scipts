@@ -1,8 +1,11 @@
 source 'https://rubygems.org'
 
 gem 'fest'
-gem 'net-ping'
 gem 'gmail'
+gem 'sqlite3'
+gem 'net-ping'
 gem 'nokogiri'
 gem 'mechanize'
+gem 'activerecord'
+gem 'active_support'
 gem 'transmission-rpc'
