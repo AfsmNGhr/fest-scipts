@@ -41,7 +41,7 @@ Mechanize.new do |agent|
     page.search('.film-item').each do |item|
       download = agent.get(item.search('.film-download').attr('href').value)
       download.search('.torrent-row').each do |row|
-        if row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?
+        if (row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?)
           torrent = row.search('.c7 a').attr('href').value
           Dir.chdir("#{Dir.home}/Downloads")
           system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
