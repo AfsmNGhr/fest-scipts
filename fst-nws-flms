@@ -12,6 +12,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 class Film < ActiveRecord::Base
+  validates :title, uniqueness: true
 end
 
 unless Film.table_exists?
@@ -30,28 +31,30 @@ Mechanize.new do |agent|
   agent.follow_meta_refresh = true
   per_page = 1
 
-  6.times do
-    page =
-      if per_page == 1
-        agent.get('http://www.fast-torrent.ru/new-films/')
-      else
-        agent.get("http://www.fast-torrent.ru/new-films/#{per_page}.html")
-      end
+  ['new-films', 'new-torrent'].each do |section|
+    6.times do
+      page =
+        if per_page == 1
+          agent.get("http://www.fast-torrent.ru/#{section}/")
+        else
+          agent.get("http://www.fast-torrent.ru/#{section}/#{per_page}.html")
+        end
 
-    page.search('.film-item').each do |item|
-      download = agent.get(item.search('.film-download').attr('href').value)
-      download.search('.torrent-row').each do |row|
-        if (row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?)
-          torrent = row.search('.c7 a').attr('href').value
-          Dir.chdir("#{Dir.home}/Downloads")
-          system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
-          Film.new(title: item.search('h2').text.gsub('/n', ' '),
-                   genre: item.search('.film-genre').text.gsub('/n', ' '),
-                   announce: item.search('.film-announce').text.gsub('/n', ' ')).save!
+      page.search('.film-item').each do |item|
+        download = agent.get(item.search('.film-download').attr('href').value)
+        download.search('.torrent-row').each do |row|
+          if (row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?)
+            torrent = row.search('.c7 a').attr('href').value
+            Dir.chdir("#{Dir.home}/Downloads")
+            system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
+            Film.new(title: item.search('h2').text.gsub('/n', ' '),
+                     genre: item.search('.film-genre').text.gsub('/n', ' '),
+                     announce: item.search('.film-announce').text.gsub('/n', ' ')).save!
+          end
         end
       end
-    end
 
-    per_page += 1
+      per_page += 1
+    end
   end
 end
