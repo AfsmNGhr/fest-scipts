@@ -13,6 +13,7 @@ ActiveRecord::Base.establish_connection(
 
 class Film < ActiveRecord::Base
   validates :title, uniqueness: true
+  scope :download, -> { where(download: true) }
 end
 
 unless Film.table_exists?
@@ -22,6 +23,8 @@ unless Film.table_exists?
      t.string :genre
      t.text :announce
      t.timestamps
+     t.string :torrent_file
+     t.boolean :download
     end
   end
 end
@@ -31,7 +34,7 @@ Mechanize.new do |agent|
   agent.follow_meta_refresh = true
   per_page = 1
 
-  ['new-films', 'new-torrent'].each do |section|
+  ['new-films'].each do |section| # 'new-torrent'
     6.times do
       page =
         if per_page == 1
@@ -43,13 +46,15 @@ Mechanize.new do |agent|
       page.search('.film-item').each do |item|
         download = agent.get(item.search('.film-download').attr('href').value)
         download.search('.torrent-row').each do |row|
-          if (row.search('.c3').text.to_f < 3 && Film.where(title: item.search('h2').text).empty?)
+          if (row.search('.c3').text.to_f < 3 &&
+              Film.where("title LIKE ?", "%#{item.search('h2').text}%").empty?)
             torrent = row.search('.c7 a').attr('href').value
             Dir.chdir("#{Dir.home}/Downloads")
             system("wget 'http://www.fast-torrent.ru#{torrent}' > /dev/null 2>&1")
             Film.new(title: item.search('h2').text.gsub('/n', ' '),
                      genre: item.search('.film-genre').text.gsub('/n', ' '),
-                     announce: item.search('.film-announce').text.gsub('/n', ' ')).save!
+                     announce: item.search('.film-announce').text.gsub('/n', ' '),
+                     torrent_file: torrent.split('/')[-1]).save!
           end
         end
       end

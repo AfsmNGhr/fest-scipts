@@ -1,11 +1,54 @@
 #!/usr/bin/env ruby
 # coding: utf-8
+gem 'activerecord'
+gem 'fest'
+gem 'transmission-rpc'
+
 require 'fest'
 require 'active_support'
+require 'active_record'
 require 'transmission-rpc'
 
+Genre = {'Fantastics' => 'Фантастика',
+         'Animations' => 'Анимация',
+         'Drama' => 'Драма',
+         'Detective' => 'Детектив',
+         'Fantasy' => 'Фэнтези',
+         'Horrors' => 'Ужасы',
+         'Action' => 'Боевик',
+         'Adventure' => 'Приключения',
+         'Serials' => 'Сериалы',
+         'Comedy' => 'Комедия'}
+
+ActiveRecord::Base.establish_connection(
+  adapter: 'sqlite3',
+  database: "#{Dir.home}/.bin/festival/data/torrents"
+)
+
+class Film < ActiveRecord::Base
+  scope :torrent, lambda { |file|
+    where(arel_table[:torrent_file].matches(file))
+  }
+end
+
+def genre(film)
+  Genre.find { |k, v| k if film.genre =~ %r"#{v}" }.first
+end
+
+def file(torrent)
+  with_hash = torrent.torrent_file.split('/')[-1].split('.')
+  (with_hash - [with_hash[-2]]).join('.')
+end
+
 Transmission.torrents.each do |t|
-  t.delete! if t.percent_done.to_i == 1
+  if t.percent_done.to_i == 1
+    film = Film.torrent("%#{file(t)}%").first
+    unless film.nil?
+      film.update_attributes(download: true) rescue ''
+      system("mv '~/Torrent/#{t.name}' '~/Torrent/#{genre(film)}'")
+    end
+    t.delete!
+  end
 end
 
 if `cat /sys/class/backlight/intel_backlight/brightness`.to_i == 0
