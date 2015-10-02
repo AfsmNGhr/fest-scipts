@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 # coding: utf-8
+gem 'bundler'
 gem 'activerecord'
 gem 'fest'
 gem 'transmission-rpc'
 
+require 'bundler'
 require 'fest'
 require 'active_support'
 require 'active_record'
@@ -22,7 +24,7 @@ Genre = {'Fantastics' => 'Фантастика',
 
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
-  database: "#{Dir.home}/.bin/festival/data/torrents"
+  database: "/home/afsmnghr/.bin/festival/data/torrents"
 )
 
 class Film < ActiveRecord::Base
